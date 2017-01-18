@@ -1,31 +1,10 @@
-- include_vars: "../../../platform_vars/default.yml"
-- include_vars: "{{ item }}"
-  with_first_found:
-   - "../../../platform_vars/{{ ansible_distribution }}.yml"
-   - "../../../platform_vars/{{ ansible_os_family }}.yml"
-   - "/dev/null"
 - name: setup group
   action: group name={{group_name}} state=present
 - name: setup user
   action: user name={{user_name}} state=present group={{group_name}}
-- name: Add IUS repository (CentOS 7)
-  yum: name=https://dl.iuscommunity.org/pub/ius/stable/CentOS/7/x86_64/ius-release-1.0-14.ius.centos7.noarch.rpm state=present
-  when: ansible_distribution == 'CentOS'
 - name: set up apt packages
   action: apt pkg={{item}} state=latest update_cache=yes
   with_items: "{{required_apt_packages}}"
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-- name: install EPEL
-  action: yum pkg=epel-release state=latest
-  when: ansible_distribution == 'CentOS'
-- name: set up yum packages
-  action: yum pkg={{item}} state=latest update_cache=yes
-  with_items: "{{required_yum_packages}}"
-  when: ansible_distribution == 'CentOS'
-- name: set up pacman packages
-  action: pacman pkg={{item}} state=latest update_cache=yes
-  with_items: "{{required_pacman_packages}}"
-  when: ansible_distribution == 'Archlinux'
 - name: set up virtualenv
   pip: name=virtualenv state=latest executable={{pip_executable}}
 - name: ensure directories
@@ -35,8 +14,6 @@
     - "{{deploy_root}}/conf.d"
 - name: ensure no nginx default conf
   action: file path=/etc/nginx/sites-enabled/default state=absent
-- template: src=../templates/nginx_global_conf.conf.j2 dest=/etc/nginx/nginx.conf
-  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Archlinux'
 - name: nginx running
   action: service name=nginx state=started enabled=yes
 - include: configuration.yml
