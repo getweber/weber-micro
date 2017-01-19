@@ -20,16 +20,7 @@ required_apt_packages:
     - nginx
     - curl
     - sudo
-required_yum_packages:
-    - rsync
-    - python34u
-    - python34u-devel
-    - python34u-pip
-    - nginx
-    - curl
-required_pacman_packages:
-    - rsync
-    - python-pip
-    - nginx
-    - curl
-    - sudo
+nginx_user: www-data
+nginx_group: www-data
+pip_executable: /usr/bin/pip3
+nginx_sites_dir: /etc/nginx/sites-enabled
